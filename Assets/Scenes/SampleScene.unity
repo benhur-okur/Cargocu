@@ -7941,7 +7941,7 @@ Transform:
   m_GameObject: {fileID: 1851433403}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10.3, y: -2.8, z: 0}
+  m_LocalPosition: {x: -5.36, y: -1.74, z: 0}
   m_LocalScale: {x: 20, y: 20, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8812,6 +8812,9 @@ MonoBehaviour:
   packageText: {fileID: 399906781}
   deliveryManager: {fileID: 1157157715}
   scoreManager: {fileID: 1215069348}
+  pickupSound: {fileID: 8300000, guid: 28d371848cce1b743a808361d9d21cbd, type: 3}
+  deliverySound: {fileID: 8300000, guid: 46022f662ecad7a439084e14664881f3, type: 3}
+  deliveryEffectPrefab: {fileID: 9214070078445282534, guid: 0162c929a45d78f42896a3c1d4e32140, type: 3}
 --- !u!114 &1969083329
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,7 +3,13 @@ guid: 3668d7c9ac10c2940bd646a26d496bbe
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - packageText: {instanceID: 0}
+  - deliveryManager: {instanceID: 0}
+  - scoreManager: {instanceID: 0}
+  - pickupSound: {fileID: 8300000, guid: 28d371848cce1b743a808361d9d21cbd, type: 3}
+  - deliverySound: {fileID: 8300000, guid: 46022f662ecad7a439084e14664881f3, type: 3}
+  - deliveryEffectPrefab: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
