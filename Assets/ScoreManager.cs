@@ -15,6 +15,12 @@ public class ScoreManager : MonoBehaviour
     {
         score += amount;
         UpdateScoreText();
+
+        // YENÝ: Puan deðiþtiðinde GameManager'a haber ver ve vardiya durumunu kontrol et
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CheckShiftProgress(score);
+        }
     }
 
     void UpdateScoreText()
