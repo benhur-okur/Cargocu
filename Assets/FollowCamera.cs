@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class FollowCamera : MonoBehaviour
 {
-    // this thing (camera) position should be the same as the car's position!!!
     
+    // kamera pozisyonunun arabayla entegre şekilde değişmsei için thingsToFollow değişkeni var bunu inspecterda arabayya atadık.
     [SerializeField] GameObject thingsToFollow;
-    void LateUpdate() //kamera takip sistemlerinde kullanılır
+    void LateUpdate() 
     {
+        // kamera takip sistemi içi thingstoFollowun pozisyonunu alıp z ekseninde -10 yaptk 2d sistemde kamera arabaya görmesi için böle yaptık değiştirilebilir buraya tekrar kontrol et
         transform.position = thingsToFollow.transform.position + new Vector3 (0, 0, -10);
     }
 }

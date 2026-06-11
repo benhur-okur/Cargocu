@@ -4,37 +4,35 @@ using UnityEngine;
 
 public class Driver : MonoBehaviour
 {
-    // speed ve velocity için base çarpan degerleri.
     float baseSteeringVelocity = 300.0f;
     float baseRideVelocity = 20.0f;
     float baseBoostSpeed = 30.0f;
     float baseSlowSpeed = 15.0f;
 
-    // anlýk degerler
     float steeringVelocity;
     float rideVelocity;
     float boostSpeed;
     float slowSpeed;
 
-    // çarpaný base deðerle çarparak anlýk deðeri hesaplýyoruz. burda AI'dan fikir ve yardým aldýk ve bu þekilde yaparak vardiya atlandýðýnda hýzlarýn artmasýný saðlýyoruz.
+    // YENÝ: Kargo aðýrlýðýndan gelen yavaþlama çarpaný (Varsayýlan 1 = Normal hýz)
+    float currentCargoPenalty = 1f;
 
     void Start()
     {
-        
-        SetSpeedMultiplier(1f); // oyun ilk baþladýgýnda çarpan 1 olarak ayrlýyoruz
+        SetSpeedMultiplier(1f);
     }
 
-    void Update() // her framede güncellenen fonksiyon bunun sayesinde kullanýcýnýninputlarýný çok rhaat þekilde kontrol edioz
+    void Update()
     {
-        // kullanýcýnýn arabayý kontrol etmesi için iputlarý alýp timedelta ile uyguladýmýz sistem
-        float steeringControl = Input.GetAxis("Horizontal") * steeringVelocity * Time.deltaTime; 
-        float rideControl = Input.GetAxis("Vertical") * rideVelocity * Time.deltaTime;
+        // YENÝ: currentCargoPenalty çarpanýný hýza ve dönüþe ekledik (Aðýr kargoyla dönmek de zorlaþýr)
+        float steeringControl = Input.GetAxis("Horizontal") * steeringVelocity * currentCargoPenalty * Time.deltaTime;
+        float rideControl = Input.GetAxis("Vertical") * rideVelocity * currentCargoPenalty * Time.deltaTime;
 
-        transform.Rotate(0, 0, -steeringControl); // z ekseninde döndüroz çünkü 2d oyunumuz
-        transform.Translate(0, rideControl, 0); // arabayý rideControle göre y eksieninde baktýgý yone dogru gitmesi için Translate iþle bu þekilde yaptýk
+        transform.Rotate(0, 0, -steeringControl);
+        transform.Translate(0, rideControl, 0);
     }
 
-    void OnTriggerEnter2D(Collider2D other) // bost ekledik ama daha boost tagli objeleri eklemdik -> future work TODOya eklemeiz lazým bunu
+    void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Boot")
         {
@@ -42,17 +40,28 @@ public class Driver : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D other) // çarpýþma olunca (eve falan) hýzýn düþmesi için koydum bunu
+    void OnCollisionEnter2D(Collision2D other)
     {
         rideVelocity = slowSpeed;
     }
 
-    // yeni bölümler içinmhýzlarýn artmasý sistemini burda base degerler ile çarpanlarý çarparak yeni degerleri elde ediyoruz, gameManager burdaki fonksiyonu kullanýyor vardiya deðiþimleirndeki araba hýz deðiþimleri için.
     public void SetSpeedMultiplier(float multiplier)
     {
         steeringVelocity = baseSteeringVelocity * multiplier;
         rideVelocity = baseRideVelocity * multiplier;
         boostSpeed = baseBoostSpeed * multiplier;
         slowSpeed = baseSlowSpeed * multiplier;
+    }
+
+    // YENÝ: Kargo alýndýðýnda Collision scripti burayý çaðýracak
+    public void ApplyCargoWeight(float penalty)
+    {
+        currentCargoPenalty = penalty;
+    }
+
+    // YENÝ: Kargo teslim edildiðinde Collision scripti burayý çaðýracak (Hýz normale döner)
+    public void RemoveCargoWeight()
+    {
+        currentCargoPenalty = 1f;
     }
 }

@@ -18,11 +18,18 @@ public class Collision : MonoBehaviour
 
     [SerializeField] AudioClip pickupSound;
     [SerializeField] AudioClip deliverySound;
-    [SerializeField] GameObject deliveryEffectPrefab; // yine yukardaki mantýkla karg alma vee teslimlerde seslerin gelmesi için  var. ve +10 efektini ekledik
+    [SerializeField] GameObject deliveryEffectPrefab; // yine yukardaki mantýkla karg alma vee teslimlerde seslerin gelmesi için  var. ve +10 efekti
+
+    // --- YENÝ EKLENEN DEÐÝÞKENLER ---
+    Driver driver; // Arabanýn hýzýný deðiþtirmek için Driver scriptine eriþmemiz lazým
+    int currentCargoReward = 10; // Teslimatta kaç puan vereceðimizi hafýzada tutacaðýmýz deðiþken
 
     private void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Arabanýn üzerindeki Driver scriptini kod ile otomatik buluyoruz
+        driver = GetComponent<Driver>();
 
         if (packageText != null)
         {
@@ -43,12 +50,30 @@ public class Collision : MonoBehaviour
             hasDelivered = false; // daha teslim yok
 
             spriteRenderer.color = hasPackageColor; // araba sarýya boyanýr kargo alýndý cunku
-            Destroy(other.gameObject); // ve etkileþimegire other objesini ekrandan siliyoruz
 
-            if (packageText != null)
+            // --- YENÝ: AÐIRLIK SÝSTEMÝ ENTEGRASYONU ---
+            CargoItem item = other.GetComponent<CargoItem>(); // Çarptýðýmýz objenin üzerindeki CargoItem scriptini okuyoruz
+            if (item != null)
             {
-                packageText.text = "Kargo Var!";
+                // Kargodan gelen skoru hafýzaya alýyoruz (teslim edince vereceðiz)
+                currentCargoReward = item.scoreReward;
+
+                // Arabayý kargonun aðýrlýðýna göre yavaþlatýyoruz (Driver scriptine ceza yolluyoruz)
+                if (driver != null) driver.ApplyCargoWeight(item.speedPenalty);
+
+                // UI'da oyuncuya kargonun aðýrlýðýný da gösteriyoruz
+                if (packageText != null)
+                {
+                    packageText.text = "Kargo: " + item.cargoWeight.ToString();
+                }
             }
+            else
+            {
+                // Eðer sahnede eski scripti olmayan bir paket kalmýþsa hata vermesin diye düz yazý
+                if (packageText != null) packageText.text = "Kargo Var!";
+            }
+
+            Destroy(other.gameObject); // ve etkileþimegire other objesini ekrandan siliyoruz
 
             if (deliveryManager != null)
             {
@@ -61,6 +86,10 @@ public class Collision : MonoBehaviour
             hasPacked = false;
             hasDelivered = true;
 
+            // --- YENÝ: YÜKÜ KALDIRMA ---
+            // Kargo teslim edildiði için arabanýn yükünü kaldýrýp hýzýný normale döndürüyoruz
+            if (driver != null) driver.RemoveCargoWeight();
+
             if (deliverySound != null)
             {
                 AudioSource.PlayClipAtPoint(deliverySound, transform.position);
@@ -68,7 +97,16 @@ public class Collision : MonoBehaviour
 
             if (deliveryEffectPrefab != null)
             {
-                Instantiate(deliveryEffectPrefab, other.transform.position, Quaternion.identity); // Sonrada external help ile Instantiate ile müþterinin oldugu poziyonda yani en son teslimat yaptýgýmýz yerde +10 efekti çýkmasýný salgadýk bu sayede
+                // Instantiate fonksiyonu bize ürettiði objeyi geri döndürür, biz de onu 'effect' adýnda bir deðiþkene atarýz
+                GameObject effect = Instantiate(deliveryEffectPrefab, other.transform.position, Quaternion.identity);
+
+                // Ürettiðimiz bu objenin altýndaki Text bileþenini kodla buluyoruz
+                Text effectText = effect.GetComponentInChildren<Text>();
+                if (effectText != null)
+                {
+                    // Yazýyý, o anki kargonun gerçek puaný neyse onunla güncelliyoruz
+                    effectText.text = "+" + currentCargoReward.ToString();
+                }
             }
 
             spriteRenderer.color = noPackageColor;
@@ -80,7 +118,9 @@ public class Collision : MonoBehaviour
 
             if (scoreManager != null)
             {
-                scoreManager.AddScore(10);
+                // --- YENÝ: DÝNAMÝK SKOR ---
+                // Sabit 10 puan yerine, hafýzaya aldýðýmýz kargonun kendi aðýrlýk puanýný veriyoruz
+                scoreManager.AddScore(currentCargoReward);
             }
 
             if (deliveryManager != null)

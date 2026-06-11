@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8416414483989677171
+--- !u!1 &6850310226277570755
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,39 +8,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3079329630671620828}
-  - component: {fileID: 8229885738216273040}
-  - component: {fileID: 6192015488066783116}
-  - component: {fileID: -4668002553222148907}
+  - component: {fileID: 3320495159960161800}
+  - component: {fileID: 114063068767808816}
+  - component: {fileID: 4602544409421953084}
+  - component: {fileID: 7128434736723993631}
   m_Layer: 0
-  m_Name: Package
-  m_TagString: Package
+  m_Name: MovingBarrier
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3079329630671620828
+--- !u!4 &3320495159960161800
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8416414483989677171}
+  m_GameObject: {fileID: 6850310226277570755}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -17.5, y: -11.68, z: 0}
-  m_LocalScale: {x: 1.3441855, y: 1.3781327, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 29.988613, y: -11.754543, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &8229885738216273040
+--- !u!212 &114063068767808816
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8416414483989677171}
+  m_GameObject: {fileID: 6850310226277570755}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -74,9 +74,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.8113208, g: 0.026023442, b: 0.398336, a: 1}
+  m_SortingOrder: 20
+  m_Sprite: {fileID: 21300000, guid: ea63b6ddefd0b28408cde396000cc3ab, type: 3}
+  m_Color: {r: 0.72156864, g: 0.14901961, b: 0.16229868, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -86,13 +86,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &6192015488066783116
+--- !u!61 &4602544409421953084
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8416414483989677171}
+  m_GameObject: {fileID: 6850310226277570755}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -115,34 +115,34 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.009679794, y: -0.09107351}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 5.12, y: 5.12}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 4.8237267, y: 4.173211}
   m_EdgeRadius: 0
---- !u!114 &-4668002553222148907
+--- !u!114 &7128434736723993631
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8416414483989677171}
+  m_GameObject: {fileID: 6850310226277570755}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b22db2234c97d07438b19bf3b322d13e, type: 3}
+  m_Script: {fileID: 11500000, guid: 557fca58560a72b44aee4b46c4733d2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cargoWeight: 0
-  speedPenalty: 1
-  scoreReward: 10
+  moveSpeed: 2
+  moveDistance: 2
+  moveHorizontal: 1

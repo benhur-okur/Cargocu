@@ -4,7 +4,7 @@ public class DeliveryManager : MonoBehaviour
 {
     [SerializeField] GameObject[] houses;
     GameObject activeDeliveryPoint;
-    int lastIndex = -1; // son seçilen ev indexini hatýrla
+    int lastIndex = -1; // son seçilen ev indexini hatýrlamak için bu sayede do while ile ayný evi seçme olasýlýgýný engelliceyouz
 
     void Start()
     {

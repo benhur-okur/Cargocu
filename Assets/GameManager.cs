@@ -11,13 +11,14 @@ public struct Shift // struct yapısı ile birden fazla vardiya biliglerini targ
     public float timeLimit;
     public float speedMultiplier;
     public int packageCount;
+    public int obstacleCount; // YENİ: Bu levelda kaç engel olacağı bilgisini ekledik
 }
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // Singleton pattern kurduk burda ki diğer scriptler GameManager ınstance şeklinde rahatlıkla ulaşacaklar
 
-    [Header("Vardiya (Level) Ayarlar�")]
+    [Header("Vardiya (Level) Ayarları")]
     public Shift[] shifts;
     private int currentShiftIndex = 0; // hangi levelda olduğumuzu tutan index buna göre dizayn edicez hangi bölümde oldugumuzu
     private bool isLevelCompleted = false; // levelın tamamlanıp tamamnlanmadıgını tutuyoruz bool olarak bu sayede level tamamlandıktan sonra oyun bitmediği halde menü açılmasını engelleyeceğiz
@@ -42,9 +43,13 @@ public class GameManager : MonoBehaviour
     public GameObject levelsPanel;
     public Button[] levelButtons;
 
-    [Header("Kargo üretim ayarları�")]
+    [Header("Kargo üretim ayarları")]
     public GameObject packagePrefab;
     public Transform[] spawnPoints;
+
+    [Header("Engel (Obstacle) Üretim Ayarları")] // YENİ: Engeller için gerekli referanslar
+    public GameObject[] obstaclePrefabs;
+    public Transform[] obstacleSpawnPoints;
 
     void Awake() // AI önerisiyle ekledik, singleton için gerekliymiş bu sayede oyun başladığında GameManager ınstance'ı oluşturuluyor ve diğer scriptler ona erişebiliyor
     {
@@ -67,7 +72,7 @@ public class GameManager : MonoBehaviour
             currentLevelText.text = "Level " + (currentShiftIndex + 1);
         }
 
-        UpdateLevelButtons(); 
+        UpdateLevelButtons();
 
         Time.timeScale = 0f;
         if (startPanel != null) startPanel.SetActive(true);
@@ -81,12 +86,12 @@ public class GameManager : MonoBehaviour
         // esc tuşununun çalışma mantıgı
         if (Input.GetKeyDown(KeyCode.Escape) && gameStarted && !gameOver && !isLevelCompleted)
         {
-            TogglePause();
+            TogglePause(); // esc tuşu time scale'ı 0 yapar ama update fonksiyonunu durdurmuyor bu sayede geri dönbebilecez oyuna ve input alabilciez tekrar pasue menusunden cıkmak için
         }
 
         if (!gameStarted || gameOver || isPaused || isLevelCompleted) return;
 
-        timeRemaining -= Time.deltaTime; 
+        timeRemaining -= Time.deltaTime;
 
         if (timerText != null) // kalan zamanı göstemek için dakika ve saniye formatında timerText objesine yazdırıyoruz
         {
@@ -117,10 +122,11 @@ public class GameManager : MonoBehaviour
 
         if (shifts.Length > 0 && currentShiftIndex < shifts.Length)
         {
-            Driver driver = FindAnyObjectByType<Driver>(); // AI'a sorarak ekledik, sahnede Driver scriptine sahip herhangi bir objeyi bulup ona erişiyoruz ki vardiya atlandığında hız değişimi yapabilelim
+            Driver driver = FindAnyObjectByType<Driver>(); //bu fonksiyon ile sahnede Driver scriptine sahip herhangi bir objeyi bulup ona erişiyoruz ki vardiya atlandığında hız değişimi yapabilelim
             if (driver != null) driver.SetSpeedMultiplier(shifts[currentShiftIndex].speedMultiplier); // driver.csdeki çarpanalara göre güncel leveldaki hızlara göre ayarlama işlemi
 
             SpawnPackages(); // artık pakaetler de spawn oluo oyun gerçekten baslıor
+            SpawnObstacles(); // YENİ: Oyuna başlarken engelleri de spawn ediyoruz
         }
     }
 
@@ -132,7 +138,6 @@ public class GameManager : MonoBehaviour
 
     public void CheckShiftProgress(int currentScore)
     {
-        
         if (isLevelCompleted) return;
 
         if (currentScore >= shifts[currentShiftIndex].targetScore) // skor hedefine ulaştıysak level complete demek için
@@ -141,42 +146,42 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    
     private void LevelCompleted()
-{
-    if (isLevelCompleted) return;
-
-    isLevelCompleted = true;
-
-    if (audioSource != null && levelCompleteSound != null)
     {
-        audioSource.PlayOneShot(levelCompleteSound);
+        if (isLevelCompleted) return;
+
+        isLevelCompleted = true;
+
+        if (audioSource != null && levelCompleteSound != null)
+        {
+            audioSource.PlayOneShot(levelCompleteSound);
+        }
+
+        StartCoroutine(OpenLevelsMenuAfterSound());
     }
 
-    StartCoroutine(OpenLevelsMenuAfterSound());
-}
-IEnumerator OpenLevelsMenuAfterSound() // burda artk menu aclıması lazım cunku currentn lecel tamamlandı
-{
-    yield return new WaitForSeconds(0.7f); // kısa bir bekleme süresi ekledik ki ses tam olarak çalabilsin yoksa kesilio ses.
-
-    int nextLevel = currentShiftIndex + 1;
-    int maxUnlocked = PlayerPrefs.GetInt("UnlockedLevel", 0);
-
-    if (nextLevel > maxUnlocked && nextLevel < shifts.Length) // buradaki prefs kontrolü ile kaydetmeyi AI'dan yardım aldık
+    IEnumerator OpenLevelsMenuAfterSound() // burda artk menu aclıması lazım cunku currentn lecel tamamlandı
     {
-        PlayerPrefs.SetInt("UnlockedLevel", nextLevel);
+        yield return new WaitForSeconds(0.7f); // kısa bir bekleme süresi ekledik ki ses tam olarak çalabilsin yoksa kesilio ses.
+
+        int nextLevel = currentShiftIndex + 1;
+        int maxUnlocked = PlayerPrefs.GetInt("UnlockedLevel", 0);
+
+        if (nextLevel > maxUnlocked && nextLevel < shifts.Length) // buradaki prefs kontrolü ile kaydetmeyi AI'dan yardım aldık
+        {
+            PlayerPrefs.SetInt("UnlockedLevel", nextLevel);
+        }
+
+        UpdateLevelButtons();
+
+        isPaused = true;
+        Time.timeScale = 0f;
+
+        if (pausePanel != null) pausePanel.SetActive(false);
+        if (levelsPanel != null) levelsPanel.SetActive(true);
     }
 
-    UpdateLevelButtons();
-
-    isPaused = true;
-    Time.timeScale = 0f;
-
-    if (pausePanel != null) pausePanel.SetActive(false);
-    if (levelsPanel != null) levelsPanel.SetActive(true);
-}
-
-    // --- MEN�, SEV�YE VE KAYIT KONTROL FONKS�YONLARI ---
+    // --- MENÜ, SEVİYE VE KAYIT KONTROL FONKSİYONLARI ---
     private void UpdateLevelButtons()
     {
         int unlockedLevel = PlayerPrefs.GetInt("UnlockedLevel", 0);
@@ -220,7 +225,6 @@ IEnumerator OpenLevelsMenuAfterSound() // burda artk menu aclıması lazım cunk
         UpdateLevelButtons(); //butonları kiltilemek iin
     }
 
-    // --- D�NAM�K KARGO OLU�TURMA S�STEM� ---
     private void SpawnPackages()
     {
         if (packagePrefab == null || spawnPoints.Length == 0) return;
@@ -228,13 +232,34 @@ IEnumerator OpenLevelsMenuAfterSound() // burda artk menu aclıması lazım cunk
         int amountToSpawn = shifts[currentShiftIndex].packageCount; // kaç kargo wpawn olucak bilgisini alıyoruz
         if (amountToSpawn > spawnPoints.Length) amountToSpawn = spawnPoints.Length; // eğer ki lenghten uzun ise spawn noktası kadar spawn yaparaız hata önleme kotnroluy
 
-        List<Transform> availablePoints = new List<Transform>(spawnPoints); // spwawn pooinltei listeye alıyouz spwan yaptıkca listeden kaldırcaz ki duplicate sıkıntısı yaşamayalım
+        //arrray ile yapamadım cunku spawnlanan poinlteri kaldıramıyozu list iel çok kolay oluyor
+        List<Transform> availablePoints = new List<Transform>(spawnPoints); // spwawn pooinltei listeye alıyouz spwan yaptıkca listeden kaldırcaz ki duplicate sıkıntısı yaşamayalım.
 
         for (int i = 0; i < amountToSpawn; i++)
         {
-            int randomIndex = Random.Range(0, availablePoints.Count); 
+            int randomIndex = Random.Range(0, availablePoints.Count);
             Instantiate(packagePrefab, availablePoints[randomIndex].position, Quaternion.identity); // Instantiate ile package prefabını spawn noktalarından rastgele seçilen birine spawn ediyoruz
             availablePoints.RemoveAt(randomIndex); // listeden cıakrıoz 
+        }
+    }
+
+    // YENİ: DİNAMİK ENGEL OLUŞTURMA SİSTEMİ
+    private void SpawnObstacles()
+    {
+        if (obstaclePrefabs == null || obstaclePrefabs.Length == 0 || obstacleSpawnPoints.Length == 0) return;
+
+        int amountToSpawn = shifts[currentShiftIndex].obstacleCount;
+        if (amountToSpawn > obstacleSpawnPoints.Length) amountToSpawn = obstacleSpawnPoints.Length;
+
+        List<Transform> availablePoints = new List<Transform>(obstacleSpawnPoints);
+
+        for (int i = 0; i < amountToSpawn; i++)
+        {
+            int randomIndex = Random.Range(0, availablePoints.Count);
+            int randomObstacle = Random.Range(0, obstaclePrefabs.Length); // Statik mi hareketli mi olacak rastgele seçiyoruz
+
+            Instantiate(obstaclePrefabs[randomObstacle], availablePoints[randomIndex].position, Quaternion.identity);
+            availablePoints.RemoveAt(randomIndex);
         }
     }
 }
